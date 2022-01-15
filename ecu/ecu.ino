@@ -49,12 +49,10 @@ void setup() {
   pinMode(LEFT_SIGNAL_SWITCH, INPUT);
   pinMode(RIGHT_SIGNAL_SWITCH, INPUT);
   pinMode(HORN_SWITCH, INPUT);
-  pinMode(LEFT_SIGNAL_CHECK, INPUT);
-  pinMode(RIGHT_SIGNAL_CHECK, INPUT);
-  pinMode(BRAKE_LIGHT_CHECK, INPUT);
 
   // variables
   bool signalOn = false;
+  int milli = millis();
 }
 
 void loop() {
@@ -89,11 +87,16 @@ void loop() {
 
 // function implementations
 int turnSignalOn(int pin, int &milli, bool &signalOn) {
+  // if it's time to switch, switch and make note of the state of the light and the time.
   if (millis() - milli > 333) {
     if (signalOn == true) {
       digitalWrite(pin, LOW);
-      milli = millis();
+      signalOn = false;
+    } else {
+      digitalWrite(pin, HIGH);
+      signalOn = true;
     }
+    milli = millis();
   }
   return 0;
 }
