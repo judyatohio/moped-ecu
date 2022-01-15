@@ -41,7 +41,6 @@ void setup() {
   pinMode(LEFT_TURN_SIGNAL, OUTPUT);
   pinMode(RIGHT_TURN_SIGNAL, OUTPUT);
   pinMode(BRAKE_LIGHT, OUTPUT);
-  pinMode(TAIL_LIGHT, OUTPUT);
   pinMode(HORN, OUTPUT);
 
   // input pin setups
