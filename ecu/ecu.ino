@@ -1,41 +1,40 @@
 // vars declarations
 // outputs
 // the headlight and tail light will both just be wired through a mosfet to the battery with the alternator current on the gate
-const int LEFT_TURN_SIGNAL = 5;
-const int RIGHT_TURN_SIGNAL = 6;
-const int BRAKE_LIGHT = 7;
-const int HORN = 8;
+const int LEFT_TURN_SIGNAL = 2;
+const int RIGHT_TURN_SIGNAL = 3;
+const int BRAKE_LIGHT = 4;
+const int HORN = 5;
 
 // inputs
-const int FRONT_BRAKE_SWITCH = 9;
-const int COASTER_BRAKE_SENSOR = 19;
-const int LEFT_SIGNAL_SWITCH = 10;
-const int RIGHT_SIGNAL_SWITCH = 11;
-const int HORN_SWITCH = 12;
+const int FRONT_BRAKE_SWITCH = 6;
+const int COASTER_BRAKE_SENSOR = 16;
+const int LEFT_SIGNAL_SWITCH = 7;
+const int RIGHT_SIGNAL_SWITCH = 8;
+const int HORN_SWITCH = 9;
 
 // extra variables
 const int THRESHOLD = 512; // this value is the value that will be used for coaster braking detection
+bool leftSignalStatus;
+bool rightSignalStatus;    // unfortunately, i have to use global variables.
+unsigned long milli;       // i cannot figure out another way to make these work
 
 // function prototypes
 
 /*
- * Function:        turnSignalOn
- * Brief:           turns on the turn signal and manages the blinking
- * Param pin:       5 for left, 6 for right, (TODO: not yet supported, 7 for hazards)
- * Param milli:     reference variable that contains the millis() from the last time a signal was switched. 0 before the first time turnSignalOn is called
- * Param signalOn:  reference bool that tracks whether or not the signal is on        
- * 
+ * Function: *signalOn
+ * Brief: manages the blinking of said signal using a few global variables that are only accessed in these functioned, and therefore shouldn't get out of hand
  */
-void turnSignalOn(int pin, int &milli, bool &signalOn);
+void leftSignalOn();
+void rightSignalOn();
 
 /*
- * Function:        turnSignalOff
- * Brief:           turns off the turn signal and sets it up to be turned on again
- * Param pin:       5 for left, 6 for right, (TODO: not yet supported, 7 for hazards)
- * Param milli:     reference variable that contains the millis() from the last time a signal was switched. 0 before the first time turnSignalOn is called
- * Param signalOn:  reference bool that tracks whether or not the current signal is on
+ * Function: *signalOff
+ * Brief: turns said signal off
  */
-void turnSignalOff(int pin, int &milli, bool &signalOn);
+void leftSignalOff();
+void rightSignalOff();
+
 
 /*
  * Function:  hornOn
@@ -61,10 +60,12 @@ void brakeLightOn();
  */
 void brakeLigthOff();
 
-void 
-
-void setup() {
+void setup()
+{
   // put your setup code here, to run once:
+  // just to make sure it uploaded correctly
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, HIGH);
 
   // output pin setups
   pinMode(LEFT_TURN_SIGNAL, OUTPUT);
@@ -80,72 +81,114 @@ void setup() {
   pinMode(HORN_SWITCH, INPUT);
 
   // variables
-  bool signalOn = false;
-  int milli = millis();
+  leftSignalStatus = false;
+  rightSignalStatus = false;
+  milli = millis();
 }
 
-void loop() {
+void loop()
+{
   // put your main code here, to run repeatedly:
 
   // check each input, and call necessary function
-  if (digitalRead(LEFT_SIGNAL_SWITCH) == HIGH) {
-    turnSignalOn(LEFT_TURN_SIGNAL, milli, signalOn);
-  } else {
-    turnSignalOff(LEFT_TURN_SIGNAL);
+  if (digitalRead(LEFT_SIGNAL_SWITCH) == HIGH)
+  {
+    leftSignalOn();
+  }
+  else
+  {
+    leftSignalOff();
   }
 
-  if (digitalRead(RIGHT_SIGNAL_SWITCH) == HIGH) {
-    turnSignalOn(RIGHT_TURN_SIGNAL);
-  } else {
-    turnSignalOff(RIGHT_TURN_SIGNAL);
+  if (digitalRead(RIGHT_SIGNAL_SWITCH) == HIGH)
+  {
+    rightSignalOn();
+  }
+  else
+  {
+    rightSignalOff();
   }
 
-  if (digitalRead(HORN_SWITCH) == HIGH) {
+  if (digitalRead(HORN_SWITCH) == HIGH)
+  {
     hornOn();
-  } else {
+  }
+  else
+  {
     hornOff();
   }
 
-  if (digitalRead(HORN_SWITCH) == LOW && analogRead(COASTER_BRAKE_SENSOR) < THRESHOLD) {
+  if (digitalRead(HORN_SWITCH) == LOW && analogRead(COASTER_BRAKE_SENSOR) < THRESHOLD)
+  {
     brakeLightOff();
-  } else {
+  }
+  else
+  {
     brakeLightOn();
   }
-
 }
 
 // function implementations
-void turnSignalOn(int pin, int &milli, bool &signalOn) {
-  // if it's time to switch, switch and make note of the state of the light and the time.
-  if (millis() - milli > 333) {
-    if (signalOn == true) {
-      digitalWrite(pin, LOW);
-      signalOn = false;
+void leftSignalOn() {
+    // if it's time to switch, switch and make note of the state of the light and the time.
+  if (millis() - milli > 333){
+
+    if (leftSignalStatus == true){
+      digitalWrite(LEFT_TURN_SIGNAL, LOW);
+      leftSignalStatus = false;
     } else {
-      digitalWrite(pin, HIGH);
-      signalOn = true;
+      digitalWrite(LEFT_TURN_SIGNAL, HIGH);
+      leftSignalStatus = true;
     }
+
     milli = millis();
+
   }
 }
 
-void turnSignalOff(int pin, int &milli, bool &signalOn) {
-  digitalWrite(pin, LOW);
-  signalOn = false;
+void rightSignalOn() {
+    // if it's time to switch, switch and make note of the state of the light and the time.
+  if (millis() - milli > 333){
+
+    if (rightSignalStatus == true){
+      digitalWrite(RIGHT_TURN_SIGNAL, LOW);
+      rightSignalStatus = false;
+    } else {
+      digitalWrite(RIGHT_TURN_SIGNAL, HIGH);
+      rightSignalStatus = true;
+    }
+
+    milli = millis();
+
+  }
 }
 
-void hornOn() {
+void leftSignalOff() {
+  digitalWrite(LEFT_TURN_SIGNAL, LOW);
+  leftSignalStatus = false;
+}
+
+void rightSignalOff() {
+  digitalWrite(RIGHT_TURN_SIGNAL, LOW);
+  rightSignalStatus = false;
+}
+
+void hornOn()
+{
   digitalWrite(HORN, HIGH);
 }
 
-void hornOff() {
+void hornOff()
+{
   digitalWrite(HORN, LOW);
 }
 
-void brakeLightOn() {
+void brakeLightOn()
+{
   digitalWrite(BRAKE_LIGHT, HIGH);
 }
 
-void brakeLightOff() {
+void brakeLightOff()
+{
   digitalWrite(BRAKE_LIGHT, LOW);
 }
