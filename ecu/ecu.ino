@@ -21,18 +21,47 @@ const int THRESHOLD = 512; // this value is the value that will be used for coas
 /*
  * Function:        turnSignalOn
  * Brief:           turns on the turn signal and manages the blinking
- * Param pin:       5 for left, 6 for right, 7 for hazards
- * Param milli:     reference variable that contains the millis() from the last time the light was switched. 0 before the first time turnSignalOn was called
+ * Param pin:       5 for left, 6 for right, (TODO: not yet supported, 7 for hazards)
+ * Param milli:     reference variable that contains the millis() from the last time a signal was switched. 0 before the first time turnSignalOn is called
  * Param signalOn:  reference bool that tracks whether or not the signal is on        
  * 
  */
 void turnSignalOn(int pin, int &milli, bool &signalOn);
-void turnSignalOff(int pin);
+
+/*
+ * Function:        turnSignalOff
+ * Brief:           turns off the turn signal and sets it up to be turned on again
+ * Param pin:       5 for left, 6 for right, (TODO: not yet supported, 7 for hazards)
+ * Param milli:     reference variable that contains the millis() from the last time a signal was switched. 0 before the first time turnSignalOn is called
+ * Param signalOn:  reference bool that tracks whether or not the current signal is on
+ */
+void turnSignalOff(int pin, int &milli, bool &signalOn);
+
+/*
+ * Function:  hornOn
+ * Brief:     turns on the horn
+ */
 void hornOn();
+
+/*
+ * Function:  hornOff
+ * Brief:     turns off the horn
+ */
 void hornOff();
+
+/*
+ * Function:  brakeLightOn
+ * Brief:     turns on the brake light
+ */
 void brakeLightOn();
+
+/*
+ * Function:  brakeLightOff
+ * Brief:     turns off the brake light
+ */
 void brakeLigthOff();
 
+void 
 
 void setup() {
   // put your setup code here, to run once:
@@ -86,7 +115,7 @@ void loop() {
 }
 
 // function implementations
-int turnSignalOn(int pin, int &milli, bool &signalOn) {
+void turnSignalOn(int pin, int &milli, bool &signalOn) {
   // if it's time to switch, switch and make note of the state of the light and the time.
   if (millis() - milli > 333) {
     if (signalOn == true) {
@@ -98,5 +127,25 @@ int turnSignalOn(int pin, int &milli, bool &signalOn) {
     }
     milli = millis();
   }
-  return 0;
+}
+
+void turnSignalOff(int pin, int &milli, bool &signalOn) {
+  digitalWrite(pin, LOW);
+  signalOn = false;
+}
+
+void hornOn() {
+  digitalWrite(HORN, HIGH);
+}
+
+void hornOff() {
+  digitalWrite(HORN, LOW);
+}
+
+void brakeLightOn() {
+  digitalWrite(BRAKE_LIGHT, HIGH);
+}
+
+void brakeLightOff() {
+  digitalWrite(BRAKE_LIGHT, LOW);
 }
